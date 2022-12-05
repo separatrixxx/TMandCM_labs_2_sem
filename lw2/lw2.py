@@ -113,33 +113,46 @@ Rect, = ax1.plot(RectangleX, RectangleY, 'purple')
 SquareX, SquareY = Square(Phi[0], S[0])
 Sqr, = ax1.plot(SquareX, SquareY, 'red')
 
-VmodA = sp.diff(phi, t)
-WmodA = sp.diff(VmodA, t)
+l = 1
+
+XE = -(h+l/2)*sp.sin(phi)
+YE = (h+l/2)*sp.cos(phi)
+
+XD = XE-s*sp.cos(phi)
+YD = YE-s*sp.sin(phi)
+
+VxD = sp.diff(XD)
+VyD = sp.diff(YD)
+VmodD = sp.sqrt(VxD**2+VyD**2)
+
+WxD = sp.diff(VxD)
+WyD = sp.diff(VyD)
+WmodD = sp.sqrt(WxD**2+WyD**2)
 
 """constructing functions"""
 countOfFrames = 200
 T_start, T_stop = 0, 12
 T = np.linspace(T_start, T_stop, countOfFrames)
 
-VmodA_def = sp.lambdify(t, VmodA)
-WmodA_def = sp.lambdify(t, WmodA)
+VmodD_def = sp.lambdify(t, VmodD)
+WmodD_def = sp.lambdify(t, WmodD)
 
-VA = VmodA_def(T)
-WA = WmodA_def(T)
+VD = VmodD_def(T)
+WD = WmodD_def(T)
 
 # plotting T-V and T-W
 ax2 = fig.add_subplot(4, 2, 2)
-ax2.set(xlim=[T_start, T_stop], ylim=[VA.min(), VA.max()])
+ax2.set(xlim=[T_start, T_stop], ylim=[VD.min(), VD.max()])
 tv_x = [T[0]]
-tv_y = [VA[0]]
+tv_y = [VD[0]]
 TV, = ax2.plot(tv_x, tv_y, '-')
 ax2.set_xlabel('T')
 ax2.set_ylabel('V')
 
 ax3 = fig.add_subplot(4, 2, 4)
-ax3.set(xlim=[T_start, T_stop], ylim=[WA.min(), WA.max()])
+ax3.set(xlim=[T_start, T_stop], ylim=[WD.min(), WD.max()])
 tw_x = [T[0]]
-tw_y = [WA[0]]
+tw_y = [WD[0]]
 TW, = ax3.plot(tv_x, tv_y, '-')
 
 ax3.set_xlabel('T')
@@ -162,9 +175,9 @@ def anima(i):
     Sqr.set_data(SqX, SqY)
 
     tv_x.append(T[i])
-    tv_y.append(VA[i])
+    tv_y.append(VD[i])
     tw_x.append(T[i])
-    tw_y.append(WA[i])
+    tw_y.append(WD[i])
     TV.set_data(tv_x, tv_y)
     TW.set_data(tw_x, tw_y)
     if i == countOfFrames - 1:
